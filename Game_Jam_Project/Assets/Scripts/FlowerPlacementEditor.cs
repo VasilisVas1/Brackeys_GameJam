@@ -1,10 +1,14 @@
 using UnityEngine;
 
-public class FlowerPlacement : MonoBehaviour
+[ExecuteInEditMode]
+public class FlowerPlacementEditor : MonoBehaviour
 {
-    void Start()
+    void Update()
     {
-        AdjustToGround();
+        if (!Application.isPlaying) // Only run in Edit Mode
+        {
+            AdjustToGround();
+        }
     }
 
     void AdjustToGround()
