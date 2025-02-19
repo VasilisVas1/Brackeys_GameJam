@@ -13,6 +13,18 @@ public class StandingBlueHeadRockController : MonoBehaviour
     public float breathingSpeed = 1f;
     public float limbMoveAmount = 0.05f; // Small hand movement
     public float limbMoveSpeed = 1.5f;
+    public MonoBehaviour GuardianOfRiddles;
+
+
+
+    public Camera playerCamera;
+    public ParticleSystem dirtParticles; // Reference to dirt particle system
+    public float shakeDuration = 0.5f;
+    public float shakeMagnitude = 0.1f;
+    public AudioSource emergeSound;
+
+
+
 
     private Vector3 initialPosition;
     private Vector3 targetPosition;
@@ -28,6 +40,7 @@ public class StandingBlueHeadRockController : MonoBehaviour
         // Store original hand positions
         if (leftHand) leftHandStart = leftHand.localPosition;
         if (rightHand) rightHandStart = rightHand.localPosition;
+        GuardianOfRiddles.enabled = false;
     }
 
     void Update()
@@ -50,16 +63,35 @@ public class StandingBlueHeadRockController : MonoBehaviour
         float elapsedTime = 0f;
         float duration = (targetPosition.y - initialPosition.y) / emergeSpeed;
 
+        // Start Camera Shake
+        StartCoroutine(ShakeCamera());
+
+        // Play dirt particle effect
+        if (dirtParticles)
+        {
+            dirtParticles.Play();
+        }
+
         while (elapsedTime < duration)
         {
             transform.position = Vector3.Lerp(initialPosition, targetPosition, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        leftfoot.SetActive(true);
-        rightfoot.SetActive(true);
+
         transform.position = targetPosition;
         hasEmerged = true;
+
+        leftfoot.SetActive(true);
+        rightfoot.SetActive(true);
+        
+        if (emergeSound && emergeSound.clip)
+        {
+            emergeSound.Play();
+            yield return new WaitForSeconds(emergeSound.clip.length);
+        }
+
+        GuardianOfRiddles.enabled = true;
     }
 
     public void TriggerEmerge()
@@ -68,5 +100,23 @@ public class StandingBlueHeadRockController : MonoBehaviour
         {
             StartCoroutine(Emerge());
         }
+    }
+
+    private IEnumerator ShakeCamera()
+    {
+        Vector3 originalPosition = playerCamera.transform.localPosition;
+        float elapsedTime = 0;
+
+        while (elapsedTime < shakeDuration)
+        {
+            float x = Random.Range(-1f, 1f) * shakeMagnitude;
+            float y = Random.Range(-1f, 1f) * shakeMagnitude;
+
+            playerCamera.transform.localPosition = originalPosition + new Vector3(x, y, 0);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        playerCamera.transform.localPosition = originalPosition;
     }
 }

@@ -23,8 +23,8 @@ public class GuardianMemoryPuzzle : MonoBehaviour
 
     void Start()
     {
-        uiMessage.SetActive(false); // Hide messages initially
-        retryMessage.SetActive(false);
+       // uiMessage.SetActive(false); 
+       // retryMessage.SetActive(false);
 
         // Store original colors of mushrooms
         foreach (GameObject mushroom in mushrooms)
@@ -118,32 +118,67 @@ public class GuardianMemoryPuzzle : MonoBehaviour
         }
     }
 
-    void CheckPlayerInput()
+public AudioSource successAudio; // Assign in Inspector
+
+void CheckPlayerInput()
+{
+    for (int i = 0; i < sequence.Count; i++)
     {
-        for (int i = 0; i < sequence.Count; i++)
+        if (playerInput[i] != sequence[i])
         {
-            if (playerInput[i] != sequence[i])
-            {
-                Debug.Log("Wrong sequence! Press R to retry.");
-                failedAttempt = true;
-                retryMessage.SetActive(true);
-                playerTurn = false; // Block further inputs
-                return;
-            }
+            Debug.Log("Wrong sequence! Press R to retry.");
+            failedAttempt = true;
+            retryMessage.SetActive(true);
+            playerTurn = false; // Block further inputs
+            return;
         }
-
-        Debug.Log("Correct! The guardian grants you the missing piece.");
-        puzzleSolved = true; // Prevent replaying the puzzle
-        puzzleInProgress = false;
-
-        rewardObject.SetActive(true);
     }
 
-    void LightUpMushroom(GameObject mushroom)
+    Debug.Log("Correct! The guardian grants you the missing piece.");
+    puzzleSolved = true; // Prevent replaying the puzzle
+    puzzleInProgress = false;
+
+    // Play success sound before granting reward
+    StartCoroutine(PlaySuccessSoundAndGrantReward());
+}
+
+IEnumerator PlaySuccessSoundAndGrantReward()
+{
+    if (successAudio != null)
     {
-        Renderer rend = mushroom.GetComponent<Renderer>();
-        rend.material.color = Color.yellow;
+        successAudio.Play();
+        yield return new WaitForSeconds(successAudio.clip.length); // Wait until the audio finishes
     }
+
+    rewardObject.SetActive(true); // Activate reward after sound ends
+}
+
+
+    public AudioSource mushroomSound; // Assign a sound effect in the Inspector
+
+public ParticleSystem poofEffect; // Assign in Inspector
+
+void LightUpMushroom(GameObject mushroom)
+{
+    Renderer rend = mushroom.GetComponent<Renderer>();
+    rend.material.color = Color.yellow;
+
+    // Play mushroom sound
+    if (mushroomSound != null)
+    {
+        mushroomSound.Play();
+    }
+
+    // Spawn poof effect
+    if (poofEffect != null)
+    {
+        ParticleSystem poof = Instantiate(poofEffect, mushroom.transform.position, Quaternion.identity);
+        poof.Play();
+        Destroy(poof.gameObject, 1f); // Destroy after effect finishes
+    }
+}
+
+
 
     void ResetMushroom(GameObject mushroom)
     {
@@ -158,13 +193,21 @@ public class GuardianMemoryPuzzle : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other)
+{
+    if (other.CompareTag("Player") && !puzzleSolved)
     {
-        if (other.CompareTag("Player") && !puzzleSolved)
+        playerInRange = true;
+        if (failedAttempt)
         {
-            playerInRange = true;
-            uiMessage.SetActive(!puzzleInProgress && !failedAttempt);
+            retryMessage.SetActive(true); // Show retry message again if failed
+        }
+        else
+        {
+            uiMessage.SetActive(!puzzleInProgress);
         }
     }
+}
+
 
     private void OnTriggerExit(Collider other)
     {
