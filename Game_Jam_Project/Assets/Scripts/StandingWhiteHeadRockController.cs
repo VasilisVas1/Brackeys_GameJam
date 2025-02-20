@@ -55,11 +55,17 @@ public class StandingWhiteHeadRockController : MonoBehaviour
         }
     }
 
+public AudioSource earthquakeSound; // Reference to earthquake sound
+
     private IEnumerator Emerge()
     {
         float elapsedTime = 0f;
         float duration = (targetPosition.y - initialPosition.y) / emergeSpeed;
 
+        if (earthquakeSound && earthquakeSound.clip)
+        {
+            earthquakeSound.Play();
+        }
         // Start Camera Shake
         StartCoroutine(ShakeCamera());
 

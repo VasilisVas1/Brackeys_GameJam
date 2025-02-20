@@ -13,6 +13,14 @@ public class StandingRedHeadRockController : MonoBehaviour
     public float breathingSpeed = 1f;
     public float limbMoveAmount = 0.05f; // Small hand movement
     public float limbMoveSpeed = 1.5f;
+    public MonoBehaviour GuardianOfBeasts;
+    public AudioSource emergeSound;
+
+
+    public Camera playerCamera;
+    public ParticleSystem dirtParticles; // Reference to dirt particle system
+    public float shakeDuration = 0.5f;
+    public float shakeMagnitude = 0.1f;
 
     private Vector3 initialPosition;
     private Vector3 targetPosition;
@@ -22,6 +30,7 @@ public class StandingRedHeadRockController : MonoBehaviour
     void Start()
     {
         // Store initial position
+        GuardianOfBeasts.enabled=false;
         initialPosition = transform.position;
         targetPosition = initialPosition + new Vector3(0, emergeHeight, 0);
 
@@ -45,10 +54,24 @@ public class StandingRedHeadRockController : MonoBehaviour
         }
     }
 
+public AudioSource earthquakeSound; // Reference to earthquake sound
+
     private IEnumerator Emerge()
     {
         float elapsedTime = 0f;
         float duration = (targetPosition.y - initialPosition.y) / emergeSpeed;
+
+        if (earthquakeSound && earthquakeSound.clip)
+        {
+            earthquakeSound.Play();
+        }
+        StartCoroutine(ShakeCamera());
+
+        if (dirtParticles)
+        {
+            dirtParticles.Play();
+        }
+
 
         while (elapsedTime < duration)
         {
@@ -60,6 +83,16 @@ public class StandingRedHeadRockController : MonoBehaviour
         rightfoot.SetActive(true);
         transform.position = targetPosition;
         hasEmerged = true;
+
+        
+        if (emergeSound && emergeSound.clip)
+        {
+            emergeSound.Play();
+            yield return new WaitForSeconds(emergeSound.clip.length);
+        }
+
+        GuardianOfBeasts.enabled = true;
+        
     }
 
     public void TriggerEmerge()
@@ -68,5 +101,23 @@ public class StandingRedHeadRockController : MonoBehaviour
         {
             StartCoroutine(Emerge());
         }
+    }
+
+     private IEnumerator ShakeCamera()
+    {
+        Vector3 originalPosition = playerCamera.transform.localPosition;
+        float elapsedTime = 0;
+
+        while (elapsedTime < shakeDuration)
+        {
+            float x = Random.Range(-1f, 1f) * shakeMagnitude;
+            float y = Random.Range(-1f, 1f) * shakeMagnitude;
+
+            playerCamera.transform.localPosition = originalPosition + new Vector3(x, y, 0);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        playerCamera.transform.localPosition = originalPosition;
     }
 }

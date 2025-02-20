@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;  // Required for UI elements
+using TMPro;           // If using TextMeshPro
 
 public class RockPickup : MonoBehaviour
 {
@@ -6,7 +8,23 @@ public class RockPickup : MonoBehaviour
     private GameObject carriedRock;
     private GameObject currentRock;
     private GameObject currentPlacementPoint;
-    public float placementOffsetZ = 0.5f; // Adjust this value to move the rock forward
+    public float placementOffsetZ = 0.5f; // Adjusts rock placement
+
+    // UI Elements
+    public GameObject pickUpText;  // Assign in Inspector
+    public GameObject placeText;   // Assign in Inspector
+
+    // Audio
+    public AudioSource audioSource;
+    public AudioClip pickUpSound;
+    public AudioClip placeSound;
+
+    void Start()
+    {
+        // Hide UI at the start
+        if (pickUpText) pickUpText.SetActive(false);
+        if (placeText) placeText.SetActive(false);
+    }
 
     void Update()
     {
@@ -25,64 +43,64 @@ public class RockPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Detect rock if it's not placed already
         if (other.CompareTag("Rock") && !isCarryingRock)
         {
             currentRock = other.gameObject;
+            if (pickUpText) pickUpText.SetActive(true);
         }
 
-        // Detect placement point if it's not used already
         if (other.CompareTag("PlacementPoint") && isCarryingRock)
         {
             currentPlacementPoint = other.gameObject;
+            if (placeText) placeText.SetActive(true);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        // Remove reference when leaving rock or placement point
         if (other.gameObject == currentRock)
         {
             currentRock = null;
+            if (pickUpText) pickUpText.SetActive(false);
         }
 
         if (other.gameObject == currentPlacementPoint)
         {
             currentPlacementPoint = null;
+            if (placeText) placeText.SetActive(false);
         }
     }
 
     void PickUpRock()
     {
         carriedRock = currentRock;
-        carriedRock.SetActive(false);  // Hide rock when picked up
+        carriedRock.SetActive(false);
         isCarryingRock = true;
-        currentRock = null;  // Clear reference
+        currentRock = null;
+
+        if (pickUpText) pickUpText.SetActive(false); // Hide UI
+        if (audioSource && pickUpSound) audioSource.PlayOneShot(pickUpSound);
     }
 
     void PlaceRock()
     {
-        // Calculate new position with Z offset
         Vector3 newPosition = currentPlacementPoint.transform.position;
-        newPosition.z += placementOffsetZ; // Moves it slightly outward
+        newPosition.z += placementOffsetZ; 
 
         carriedRock.transform.position = newPosition;
-        carriedRock.SetActive(true);  // Show rock again
+        carriedRock.SetActive(true);
 
-        // Disable the trigger so the rock becomes solid
         Collider rockCollider = carriedRock.GetComponent<Collider>();
-        if (rockCollider != null)
-        {
-            rockCollider.isTrigger = false;
-        }
+        if (rockCollider) rockCollider.isTrigger = false;
 
-        // Change tags so they cannot be reused
         carriedRock.tag = "PlacedRock";
         currentPlacementPoint.tag = "UsedPlacementPoint";
 
-        // Reset variables
         isCarryingRock = false;
         carriedRock = null;
         currentPlacementPoint = null;
+
+        if (placeText) placeText.SetActive(false); // Hide UI
+        if (audioSource && placeSound) audioSource.PlayOneShot(placeSound);
     }
 }

@@ -21,6 +21,16 @@ public class GuardianOfRiddles : MonoBehaviour
     private bool playerInRange = false;
     private bool riddleStarted = false;
 
+
+    //TEST TEST TEST TEST
+    public GameObject redTrigger, whiteTrigger,blueTrigger;
+
+    public GameObject leftEye,rightEye;
+
+    public Material newMaterial; // Assign this in the Inspector
+
+
+
     void Start()
     {
         uiMessage.SetActive(false);
@@ -99,6 +109,14 @@ IEnumerator HandleCorrectAnswer()
     FirstPersonController.enabled=true;
 
     rewardObject.SetActive(true);
+    //TEST TEST TEST TEST
+    redTrigger.SetActive(true);
+    whiteTrigger.SetActive(true);
+    blueTrigger.transform.position = new Vector3(blueTrigger.transform.position.x, blueTrigger.transform.position.y + 40f, blueTrigger.transform.position.z);
+    leftEye.GetComponent<Renderer>().material = newMaterial;
+    rightEye.GetComponent<Renderer>().material = newMaterial;
+
+    //TEST TEST TEST TEST
 }
 
 IEnumerator HandleWrongAnswer()

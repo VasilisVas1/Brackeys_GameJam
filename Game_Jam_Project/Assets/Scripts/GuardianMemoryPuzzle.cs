@@ -21,6 +21,14 @@ public class GuardianMemoryPuzzle : MonoBehaviour
     public GameObject uiMessage; // Assign a UI Text or Panel ("Press E to start")
     public GameObject retryMessage; // Assign a UI Text ("Press R to retry")
 
+    public GameObject redTrigger, blueTrigger,whiteTrigger;
+    public GameObject leftEye,rightEye;
+
+
+    public Material newMaterial; // Assign this in the Inspector
+
+
+
     void Start()
     {
        // uiMessage.SetActive(false); 
@@ -149,6 +157,14 @@ IEnumerator PlaySuccessSoundAndGrantReward()
         successAudio.Play();
         yield return new WaitForSeconds(successAudio.clip.length); // Wait until the audio finishes
     }
+
+    //TEST TEST TEST TEST
+    redTrigger.SetActive(true);
+    blueTrigger.SetActive(true);
+    whiteTrigger.transform.position = new Vector3(whiteTrigger.transform.position.x, whiteTrigger.transform.position.y + 40f, whiteTrigger.transform.position.z);
+    leftEye.GetComponent<Renderer>().material = newMaterial;
+    rightEye.GetComponent<Renderer>().material = newMaterial;
+
 
     rewardObject.SetActive(true); // Activate reward after sound ends
 }

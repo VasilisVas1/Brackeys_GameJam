@@ -7,6 +7,7 @@ public class StandingBlueHeadRockController : MonoBehaviour
     public GameObject triggerObject;
     public GameObject leftfoot,rightfoot;
 
+
     public float emergeHeight = 1f;
     public float emergeSpeed = 2f;
     public float breathingIntensity = 0.1f; // Small breathing movement
@@ -21,6 +22,8 @@ public class StandingBlueHeadRockController : MonoBehaviour
     public ParticleSystem dirtParticles; // Reference to dirt particle system
     public float shakeDuration = 0.5f;
     public float shakeMagnitude = 0.1f;
+
+
     public AudioSource emergeSound;
 
 
@@ -58,10 +61,19 @@ public class StandingBlueHeadRockController : MonoBehaviour
         }
     }
 
+public AudioSource earthquakeSound; // Reference to earthquake sound
+
     private IEnumerator Emerge()
     {
         float elapsedTime = 0f;
         float duration = (targetPosition.y - initialPosition.y) / emergeSpeed;
+
+
+        // Play Earthquake Sound
+        if (earthquakeSound && earthquakeSound.clip)
+        {
+            earthquakeSound.Play();
+        }
 
         // Start Camera Shake
         StartCoroutine(ShakeCamera());

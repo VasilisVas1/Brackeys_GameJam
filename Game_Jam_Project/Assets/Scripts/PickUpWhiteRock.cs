@@ -41,6 +41,9 @@ public class PickUpWhiteRock : MonoBehaviour
     {
         Debug.Log("Player picked up the White Rock!");
         uiMessage.SetActive(false);
-        Destroy(gameObject); // Remove the reward from the scene
+        //Destroy(gameObject); // Remove the reward from the scene
+        gameObject.SetActive(false);
+        RockCollectionManager.hasWhiteRock = true;
+
     }
 }
