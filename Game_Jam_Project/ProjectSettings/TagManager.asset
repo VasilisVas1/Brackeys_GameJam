@@ -13,6 +13,7 @@ TagManager:
   - WhiteRock
   - BlueRock
   - RedRock
+  - Monster
   layers:
   - Default
   - TransparentFX

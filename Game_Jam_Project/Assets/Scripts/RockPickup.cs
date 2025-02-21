@@ -42,34 +42,39 @@ public class RockPickup : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Rock") && !isCarryingRock)
-        {
-            currentRock = other.gameObject;
-            if (pickUpText) pickUpText.SetActive(true);
-        }
+{
+    if (!enabled) return; // Ensure the script is active
 
-        if (other.CompareTag("PlacementPoint") && isCarryingRock)
-        {
-            currentPlacementPoint = other.gameObject;
-            if (placeText) placeText.SetActive(true);
-        }
+    if (other.CompareTag("Rock") && !isCarryingRock)
+    {
+        currentRock = other.gameObject;
+        if (pickUpText) pickUpText.SetActive(true);
     }
 
-    private void OnTriggerExit(Collider other)
+    if (other.CompareTag("PlacementPoint") && isCarryingRock)
     {
-        if (other.gameObject == currentRock)
-        {
-            currentRock = null;
-            if (pickUpText) pickUpText.SetActive(false);
-        }
-
-        if (other.gameObject == currentPlacementPoint)
-        {
-            currentPlacementPoint = null;
-            if (placeText) placeText.SetActive(false);
-        }
+        currentPlacementPoint = other.gameObject;
+        if (placeText) placeText.SetActive(true);
     }
+}
+
+private void OnTriggerExit(Collider other)
+{
+    if (!enabled) return; // Ensure the script is active
+
+    if (other.gameObject == currentRock)
+    {
+        currentRock = null;
+        if (pickUpText) pickUpText.SetActive(false);
+    }
+
+    if (other.gameObject == currentPlacementPoint)
+    {
+        currentPlacementPoint = null;
+        if (placeText) placeText.SetActive(false);
+    }
+}
+
 
     void PickUpRock()
     {
