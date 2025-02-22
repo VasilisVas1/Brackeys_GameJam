@@ -6,6 +6,7 @@ public class WandShooting : MonoBehaviour
     public Transform shootPoint;        // Empty GameObject at wand tip where magic spawns
     public ParticleSystem poofEffect;   // Assign the Poof Effect Prefab
     public float magicSpeed = 20f;      // Speed of the magic balls
+    public AudioSource magicShoot;
 
     private bool canShoot = false;      // Becomes true when the player picks up the wand
 
@@ -37,6 +38,7 @@ public class WandShooting : MonoBehaviour
         if (rb != null)
         {
             rb.linearVelocity = shootPoint.forward * magicSpeed; // Shoot in the direction the player looks
+            magicShoot.Play();
         }
     }
 }

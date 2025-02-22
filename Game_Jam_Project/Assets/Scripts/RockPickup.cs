@@ -1,6 +1,7 @@
 using UnityEngine;
-using UnityEngine.UI;  // Required for UI elements
-using TMPro;           // If using TextMeshPro
+using UnityEngine.UI;  
+using TMPro;           
+using System.Collections; // Required for IEnumerator
 
 public class RockPickup : MonoBehaviour
 {
@@ -8,33 +9,40 @@ public class RockPickup : MonoBehaviour
     private GameObject carriedRock;
     private GameObject currentRock;
     private GameObject currentPlacementPoint;
-    public float placementOffsetZ = 0.5f; // Adjusts rock placement
+    public float placementOffsetZ = 0.5f; 
 
     // UI Elements
-    public GameObject pickUpText;  // Assign in Inspector
-    public GameObject placeText;   // Assign in Inspector
+    public GameObject pickUpText;  
+    public GameObject placeText;   
 
     // Audio
     public AudioSource audioSource;
     public AudioClip pickUpSound;
     public AudioClip placeSound;
+    
+    // Narration
+    public AudioClip narrationClip;
+    public GameObject speechBubble;
+    public TMP_Text subtitleText;
+    public string subtitleTextContent;
+    public RectTransform bubbleRectTransform;
+
+    private int placedRockCount = 0;  // Track placed rocks
 
     void Start()
     {
-        // Hide UI at the start
         if (pickUpText) pickUpText.SetActive(false);
         if (placeText) placeText.SetActive(false);
+        if (speechBubble) speechBubble.SetActive(false);
     }
 
     void Update()
     {
-        // Pick up rock
         if (!isCarryingRock && currentRock != null && Input.GetKeyDown(KeyCode.E))
         {
             PickUpRock();
         }
 
-        // Place rock
         if (isCarryingRock && currentPlacementPoint != null && Input.GetKeyDown(KeyCode.E))
         {
             PlaceRock();
@@ -42,39 +50,38 @@ public class RockPickup : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other)
-{
-    if (!enabled) return; // Ensure the script is active
-
-    if (other.CompareTag("Rock") && !isCarryingRock)
     {
-        currentRock = other.gameObject;
-        if (pickUpText) pickUpText.SetActive(true);
+        if (!enabled) return; 
+
+        if (other.CompareTag("Rock") && !isCarryingRock)
+        {
+            currentRock = other.gameObject;
+            if (pickUpText) pickUpText.SetActive(true);
+        }
+
+        if (other.CompareTag("PlacementPoint") && isCarryingRock)
+        {
+            currentPlacementPoint = other.gameObject;
+            if (placeText) placeText.SetActive(true);
+        }
     }
 
-    if (other.CompareTag("PlacementPoint") && isCarryingRock)
+    private void OnTriggerExit(Collider other)
     {
-        currentPlacementPoint = other.gameObject;
-        if (placeText) placeText.SetActive(true);
+        if (!enabled) return;
+
+        if (other.gameObject == currentRock)
+        {
+            currentRock = null;
+            if (pickUpText) pickUpText.SetActive(false);
+        }
+
+        if (other.gameObject == currentPlacementPoint)
+        {
+            currentPlacementPoint = null;
+            if (placeText) placeText.SetActive(false);
+        }
     }
-}
-
-private void OnTriggerExit(Collider other)
-{
-    if (!enabled) return; // Ensure the script is active
-
-    if (other.gameObject == currentRock)
-    {
-        currentRock = null;
-        if (pickUpText) pickUpText.SetActive(false);
-    }
-
-    if (other.gameObject == currentPlacementPoint)
-    {
-        currentPlacementPoint = null;
-        if (placeText) placeText.SetActive(false);
-    }
-}
-
 
     void PickUpRock()
     {
@@ -83,7 +90,7 @@ private void OnTriggerExit(Collider other)
         isCarryingRock = true;
         currentRock = null;
 
-        if (pickUpText) pickUpText.SetActive(false); // Hide UI
+        if (pickUpText) pickUpText.SetActive(false);
         if (audioSource && pickUpSound) audioSource.PlayOneShot(pickUpSound);
     }
 
@@ -105,7 +112,33 @@ private void OnTriggerExit(Collider other)
         carriedRock = null;
         currentPlacementPoint = null;
 
-        if (placeText) placeText.SetActive(false); // Hide UI
+        placedRockCount++; // Increment rock placement count
+
+        if (placeText) placeText.SetActive(false);
         if (audioSource && placeSound) audioSource.PlayOneShot(placeSound);
+
+        // Trigger narration when the third rock is placed
+        if (placedRockCount == 3)
+        {
+            StartCoroutine(PlayNarration());
+        }
+    }
+
+    private IEnumerator PlayNarration()
+    {
+        if (narrationClip != null && audioSource != null && speechBubble != null)
+        {
+            speechBubble.SetActive(true);
+            subtitleText.text = subtitleTextContent;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubbleRectTransform);
+
+            audioSource.clip = narrationClip;
+            audioSource.Play();
+
+            yield return new WaitForSeconds(narrationClip.length);
+
+            subtitleText.text = "";
+            speechBubble.SetActive(false);
+        }
     }
 }

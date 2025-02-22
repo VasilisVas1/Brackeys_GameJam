@@ -5,14 +5,17 @@ public class MonsterAI : MonoBehaviour
     public float hopForce = 8f;    // Vertical force applied when hopping
     public float moveForce = 4f;   // Forward movement force
     public float hopInterval = 1f; // Time between hops
+    public float unstuckBoost = 2f; // Extra push to get unstuck
 
     public GameObject player;
     private Rigidbody rb;
-    public LayerMask groundLayer; // Assign the correct ground layer in the Inspector
+    private AudioSource audioSource; // Audio source for jump sound
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>(); // Get the AudioSource component
+
         if (player == null)
         {
             player = GameObject.FindGameObjectWithTag("Player");
@@ -24,8 +27,10 @@ public class MonsterAI : MonoBehaviour
     {
         if (rb.linearVelocity.magnitude < 0.1f && IsGrounded())
         {
-            Debug.Log("Monster seems stuck, applying extra force.");
-            rb.AddForce(Vector3.up * 2f, ForceMode.Impulse); // Slight lift to unstuck
+            Debug.Log("Monster seems stuck, applying unstuck force.");
+            
+            Vector3 unstuckForce = Vector3.up * (hopForce / 2) + transform.forward * unstuckBoost;
+            rb.AddForce(unstuckForce, ForceMode.Impulse);
         }
     }
 
@@ -33,25 +38,30 @@ public class MonsterAI : MonoBehaviour
     {
         if (player == null) return;
 
-        // Ensure we only hop if we're grounded
         if (IsGrounded())
         {
             Vector3 direction = (player.transform.position - transform.position).normalized;
             Vector3 hopDirection = new Vector3(direction.x * moveForce, hopForce, direction.z * moveForce);
 
-            // Apply an impulse force to simulate a natural hop
             rb.AddForce(hopDirection, ForceMode.Impulse);
+
+            // Play jump sound
+            if (audioSource != null && audioSource.clip != null)
+            {
+                audioSource.Play();
+            }
         }
     }
 
     private bool IsGrounded()
     {
-        float checkDistance = 1.1f;
-        Vector3 origin = transform.position;
+        float checkDistance = 3.3f;
 
-        return Physics.Raycast(origin, Vector3.down, checkDistance, groundLayer) ||
-               Physics.Raycast(origin + Vector3.right * 0.2f, Vector3.down, checkDistance, groundLayer) ||
-               Physics.Raycast(origin + Vector3.left * 0.2f, Vector3.down, checkDistance, groundLayer);
+        return Physics.Raycast(transform.position, Vector3.down, checkDistance) ||
+               Physics.Raycast(transform.position + Vector3.right * 0.3f, Vector3.down, checkDistance) ||
+               Physics.Raycast(transform.position + Vector3.left * 0.3f, Vector3.down, checkDistance) ||
+               Physics.Raycast(transform.position + Vector3.forward * 0.3f, Vector3.down, checkDistance) ||
+               Physics.Raycast(transform.position + Vector3.back * 0.3f, Vector3.down, checkDistance);
     }
 
     private void OnTriggerEnter(Collider other)

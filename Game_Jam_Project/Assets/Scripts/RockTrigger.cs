@@ -8,6 +8,8 @@ public class RockTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!enabled) return; // Check if the script is enabled
+
         if (other.CompareTag("Player") && rockController != null)
         {
             //TEST TEST TEST TEST

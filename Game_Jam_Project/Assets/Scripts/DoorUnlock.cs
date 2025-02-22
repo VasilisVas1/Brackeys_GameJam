@@ -8,8 +8,8 @@ public class DoorUnlock : MonoBehaviour
     public Transform whiteRockSlot, blueRockSlot, redRockSlot;
     public Transform leftDoor, rightDoor;
     public float doorOpenDistance = 3f;
-    public float rockMoveSpeed = 10f; // Increased for faster movement
-    public float doorOpenSpeed = 5f; // Increased for faster door opening
+    public float rockMoveSpeed = 10f;
+    public float doorOpenSpeed = 5f;
 
     public GameObject whiteRock, blueRock, redRock;
 
@@ -27,7 +27,7 @@ public class DoorUnlock : MonoBehaviour
 
     void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        if (playerInRange && !isDoorUnlocked && Input.GetKeyDown(KeyCode.E))
         {
             TryToOpenDoor();
         }
@@ -35,9 +35,9 @@ public class DoorUnlock : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !isDoorUnlocked) // Prevent interaction after unlocking
         {
-            player = other.transform; // Get player position
+            player = other.transform;
             playerInRange = true;
             uiMessage.SetActive(true);
         }
@@ -79,14 +79,14 @@ public class DoorUnlock : MonoBehaviour
             FloatingRock floatingScript = rock.GetComponent<FloatingRock>();
             if (floatingScript != null)
             {
-                floatingScript.enabled = false; // Disable floating behavior
+                floatingScript.enabled = false;
             }
         }
     }
 
     private IEnumerator UnlockDoor()
     {
-        isDoorUnlocked = true;
+        isDoorUnlocked = true; // Prevent further interaction
         uiMessage.SetActive(false);
         unlockSound.Play();
 
@@ -94,15 +94,15 @@ public class DoorUnlock : MonoBehaviour
         if (blueRockSlot != null) yield return StartCoroutine(FloatRockToSlot(blueRock, blueRockSlot.position));
         if (redRockSlot != null) yield return StartCoroutine(FloatRockToSlot(redRock, redRockSlot.position));
 
-        yield return new WaitForSeconds(0.2f); // Short delay before opening the door
+        yield return new WaitForSeconds(0.2f);
         StartCoroutine(OpenDoor());
     }
 
     private IEnumerator FloatRockToSlot(GameObject rock, Vector3 targetPosition)
     {
-        Vector3 startPosition = player.position + Vector3.up * 1.5f; // Start slightly above the player
+        Vector3 startPosition = player.position + Vector3.up * 1.5f;
         float elapsedTime = 0f;
-        float duration = 0.5f; // Fast movement
+        float duration = 0.5f;
 
         while (elapsedTime < duration)
         {
@@ -122,7 +122,7 @@ public class DoorUnlock : MonoBehaviour
         Vector3 rightTargetPos = rightStartPos + Vector3.right * doorOpenDistance;
 
         float elapsedTime = 0;
-        float duration = 0.5f; // Faster door opening
+        float duration = 0.5f;
 
         while (elapsedTime < duration)
         {

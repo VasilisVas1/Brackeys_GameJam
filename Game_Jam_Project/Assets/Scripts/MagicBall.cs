@@ -3,6 +3,7 @@ using UnityEngine;
 public class MagicBall : MonoBehaviour
 {
     public ParticleSystem poofEffectPrefab; // Assign the poof effect prefab in the inspector
+    public AudioSource monsterDead;
 
     void OnTriggerEnter(Collider other)
     {
@@ -12,12 +13,16 @@ public class MagicBall : MonoBehaviour
             Instantiate(poofEffectPrefab, transform.position, Quaternion.identity);
         }
 
-        if (other.CompareTag("Monster")) // Destroy monster when hit
+    if (other.CompareTag("Monster")) 
+{
+    if (monsterDead != null)
     {
-        Destroy(other.gameObject);
+        AudioSource.PlayClipAtPoint(monsterDead.clip, other.transform.position);
     }
+    Destroy(other.gameObject);
+}
 
-        // Destroy the magic ball
+
         Destroy(gameObject);
     }
 }

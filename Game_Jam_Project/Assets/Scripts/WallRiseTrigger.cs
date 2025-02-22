@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using TMPro;
+using UnityEngine.UI;
 
 public class WallRiseTrigger : MonoBehaviour
 {
@@ -17,6 +19,14 @@ public class WallRiseTrigger : MonoBehaviour
 
     private Vector3 startPosition;
     private bool hasTriggered = false;
+
+
+    public AudioClip narrationClip;
+    public string subtitleTextContent;
+    public TMP_Text subtitleText;
+    public AudioSource audioSource;
+    public GameObject speechBubble; // Reference to the speech bubble UI
+    public RectTransform bubbleRectTransform; // The RectTransform of the speech bubble
 
     void Start()
     {
@@ -44,27 +54,67 @@ public class WallRiseTrigger : MonoBehaviour
             StartCoroutine(RaiseWall());
             StartCoroutine(ShakeCamera());
 
+        }
+    }
+
+   IEnumerator RaiseWall()
+{
+    float elapsedTime = 0;
+
+    while (elapsedTime < riseDuration)
+    {
+        wall.position = Vector3.Lerp(startPosition, finalPosition, elapsedTime / riseDuration);
+        elapsedTime += Time.deltaTime;
+        yield return null;
+    }
+
+    wall.position = finalPosition; // Ensure wall reaches the correct position
+
+    // Wait for the sound to finish before starting narration
+    if (wallRiseSound != null)
+    {
+        yield return new WaitForSeconds(wallRiseSound.clip.length);
+    }
+
+    // Start narration
+    StartCoroutine(PlayNarration());
+}
+
+private IEnumerator PlayNarration()
+    {
+        if (narrationClip != null && audioSource != null && speechBubble != null)
+        {
+            // Enable the speech bubble
+            speechBubble.SetActive(true);
+            
+            // Set subtitle text
+            subtitleText.text = subtitleTextContent;
+
+            // Force UI to update its size
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubbleRectTransform);
+
+            // Play audio
+            audioSource.clip = narrationClip;
+            audioSource.Play();
+
+            // Wait for audio to finish
+            yield return new WaitForSeconds(narrationClip.length);
+
             // ✅ Enable RockPickup script
             if (rockPickup != null)
             {
                 rockPickup.enabled = true;
             }
+
+            // Clear text and hide speech bubble
+            subtitleText.text = "";
+            speechBubble.SetActive(false);
+
+            // Disable collider to prevent re-triggering
+            GetComponent<Collider>().enabled = false;
         }
     }
 
-    IEnumerator RaiseWall()
-    {
-        float elapsedTime = 0;
-
-        while (elapsedTime < riseDuration)
-        {
-            wall.position = Vector3.Lerp(startPosition, finalPosition, elapsedTime / riseDuration);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        wall.position = finalPosition; // Ensure wall reaches correct position
-    }
 
     IEnumerator ShakeCamera()
     {
