@@ -73,7 +73,7 @@ public class WallRiseTrigger : MonoBehaviour
     // Wait for the sound to finish before starting narration
     if (wallRiseSound != null)
     {
-        yield return new WaitForSeconds(wallRiseSound.clip.length);
+        yield return new WaitForSeconds(wallRiseSound.clip.length-20);
     }
 
     // Start narration

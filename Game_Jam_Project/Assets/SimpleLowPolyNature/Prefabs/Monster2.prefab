@@ -765,6 +765,8 @@ MonoBehaviour:
   hopInterval: 1
   unstuckBoost: 2
   player: {fileID: 0}
+  playerHit: {fileID: 8300000, guid: e40f006acb05257408b6b371806aaeda, type: 3}
+  monsterSound: {fileID: 8300000, guid: 99d2f34062da54b42b7817c81f338f79, type: 3}
 --- !u!82 &-7907804985022425568
 AudioSource:
   m_ObjectHideFlags: 0

@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
 public class StandingRedHeadRockController : MonoBehaviour
 {
@@ -26,6 +28,11 @@ public class StandingRedHeadRockController : MonoBehaviour
     private Vector3 targetPosition;
     private Vector3 leftHandStart, rightHandStart;
     private bool hasEmerged = false;
+
+     public TMP_Text subtitleText;
+    public GameObject speechBubble; // Reference to the speech bubble UI
+    public RectTransform bubbleRectTransform; // The RectTransform of the speech bubble
+        public string subtitleTextContent;
 
     void Start()
     {
@@ -87,9 +94,21 @@ public AudioSource earthquakeSound; // Reference to earthquake sound
         
         if (emergeSound && emergeSound.clip)
         {
+
+            //TEST TEST TEST
+            speechBubble.SetActive(true);
+            
+            // Set subtitle text
+            subtitleText.text = subtitleTextContent;
+
+            // Force UI to update its size
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubbleRectTransform);
+            //TEST TEST TEST
             emergeSound.Play();
             yield return new WaitForSeconds(emergeSound.clip.length);
         }
+        subtitleText.text = "";
+            speechBubble.SetActive(false);
 
         GuardianOfBeasts.enabled = true;
         

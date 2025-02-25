@@ -28,6 +28,9 @@ public class FirstPersonController : MonoBehaviour
     public float mouseSensitivity = 2f;
     public float maxLookAngle = 50f;
 
+    public bool isPaused = false; // Add this variable to check if the settings menu is open
+
+
     // Crosshair
     public bool lockCursor = true;
     public bool crosshair = true;
@@ -203,6 +206,10 @@ public class FirstPersonController : MonoBehaviour
     private void Update()
     {
         #region Camera
+
+        //TEST TEST
+        if (isPaused) return; // If paused, do not process mouse input
+
 
         // Control camera movement
         if(cameraCanMove)

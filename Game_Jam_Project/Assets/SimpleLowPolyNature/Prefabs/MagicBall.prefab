@@ -152,3 +152,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   poofEffectPrefab: {fileID: 1281453279337149622, guid: d323f54a139ce2245989d3fb95da355b, type: 3}
   monsterDead: {fileID: 2327142607385338601, guid: f6518f44f15e54949b618b3c51ebcae7, type: 3}
+  audioSource: {fileID: 2327142607385338601, guid: f6518f44f15e54949b618b3c51ebcae7, type: 3}
+  narrationClip: {fileID: 8300000, guid: db4271b4d9c6d2d4798b5337f4156655, type: 3}
+  speechBubble: {fileID: 0}
+  subtitleText: {fileID: 0}
+  subtitleTextContent: Look at you! Wielding magic like a seasoned wizard. Absolutely
+    nothing can go wrong.
+  bubbleRectTransform: {fileID: 0}

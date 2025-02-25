@@ -11,6 +11,9 @@ public class MonsterAI : MonoBehaviour
     private Rigidbody rb;
     private AudioSource audioSource; // Audio source for jump sound
 
+
+    private RespawnManager respawnManager; // Reference to RespawnManager
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -20,6 +23,9 @@ public class MonsterAI : MonoBehaviour
         {
             player = GameObject.FindGameObjectWithTag("Player");
         }
+
+        respawnManager = FindObjectOfType<RespawnManager>(); // Find the RespawnManager in the scene
+
         InvokeRepeating(nameof(HopTowardsPlayer), 0.5f, hopInterval);
     }
 
@@ -64,12 +70,41 @@ public class MonsterAI : MonoBehaviour
                Physics.Raycast(transform.position + Vector3.back * 0.3f, Vector3.down, checkDistance);
     }
 
+/*
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player Lost!"); // Handle Game Over
-            Time.timeScale = 0;        // Pause the game
+            Debug.Log("Player Lost!"); 
+            
+            // Call Game Over from RespawnManager
+            if (respawnManager != null)
+            {
+                respawnManager.RespawnPlayer();
+            }
+            else
+            {
+                Debug.LogError("RespawnManager not found in the scene!");
+            }
         }
     }
+*/
+private void OnCollisionEnter(Collision collision)
+{
+    if (collision.gameObject.CompareTag("Player"))
+    {
+        Debug.Log("Player hit by a monster! Respawning...");
+
+        // Call RespawnPlayer instead of handling game over
+        if (respawnManager != null)
+        {
+            respawnManager.RespawnPlayer();
+        }
+        else
+        {
+            Debug.LogError("RespawnManager not found in the scene!");
+        }
+    }
+}
+
 }

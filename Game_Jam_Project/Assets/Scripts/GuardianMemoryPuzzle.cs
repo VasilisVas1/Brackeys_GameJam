@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class GuardianMemoryPuzzle : MonoBehaviour
 {
@@ -26,6 +27,12 @@ public class GuardianMemoryPuzzle : MonoBehaviour
 
 
     public Material newMaterial; // Assign this in the Inspector
+
+    //test test test
+    public TMP_Text subtitleText;
+    public GameObject speechBubble; // Reference to the speech bubble UI
+    public RectTransform bubbleRectTransform; // The RectTransform of the speech bubble
+        public string subtitleTextContent;
 
 
 
@@ -154,9 +161,20 @@ IEnumerator PlaySuccessSoundAndGrantReward()
 {
     if (successAudio != null)
     {
+        //TEST TEST TEST
+            speechBubble.SetActive(true);
+            
+            // Set subtitle text
+            subtitleText.text = subtitleTextContent;
+
+            // Force UI to update its size
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubbleRectTransform);
+            //TEST TEST TEST
         successAudio.Play();
         yield return new WaitForSeconds(successAudio.clip.length); // Wait until the audio finishes
     }
+    subtitleText.text = "";
+    speechBubble.SetActive(false);
 
     //TEST TEST TEST TEST
     redTrigger.SetActive(true);

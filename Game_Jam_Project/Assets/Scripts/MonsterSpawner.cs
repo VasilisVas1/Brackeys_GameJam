@@ -1,6 +1,10 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+
 
 public class MonsterSpawner : MonoBehaviour
 {
@@ -11,13 +15,23 @@ public class MonsterSpawner : MonoBehaviour
     public float waveDuration = 120f;
     public GameObject objectToDeactivate; // Assign in Inspector
 
-    private bool isSpawning = false;
-    private List<GameObject> spawnedMonsters = new List<GameObject>();
+    public bool isSpawning = false;
+    public List<GameObject> spawnedMonsters = new List<GameObject>();
+
+    // Narration components
+    public AudioSource audioSource;
+    public AudioClip narrationClip;
+    public GameObject speechBubble;
+    public TMP_Text subtitleText;
+    public string subtitleTextContent;
+    public RectTransform bubbleRectTransform;
+    public bool hasPlayedNarration = false; // To ensure narration only plays once
 
     public void StartWave()
     {
         StopAllCoroutines(); // Ensure no previous coroutine is running
         isSpawning = true;
+        hasPlayedNarration = false; // Reset for a new wave
         StartCoroutine(SpawnMonsters());
     }
 
@@ -51,6 +65,20 @@ public class MonsterSpawner : MonoBehaviour
             GameObject monster = Instantiate(monsterPrefab, hit.point, Quaternion.identity);
             spawnedMonsters.Add(monster);
             monster.AddComponent<MonsterTracker>().spawner = this; // Attach tracker
+
+            // Play narration only for the first spawned monster
+            if (!hasPlayedNarration)
+            {
+                hasPlayedNarration = true;
+                //StartCoroutine(PlayNarration());
+                //test test test
+                if (narrationCoroutine != null) // Stop any existing narration
+            {
+                StopCoroutine(narrationCoroutine);
+            }
+
+            narrationCoroutine = StartCoroutine(PlayNarration());
+            }
         }
         else
         {
@@ -79,7 +107,39 @@ public class MonsterSpawner : MonoBehaviour
             objectToDeactivate.SetActive(false);
         }
     }
+    public Coroutine narrationCoroutine; // Store the coroutine
+
+
+    private IEnumerator PlayNarration()
+    {
+        if (narrationClip != null && audioSource != null && speechBubble != null)
+        {
+            // Enable the speech bubble
+            speechBubble.SetActive(true);
+
+            // Set subtitle text
+            subtitleText.text = subtitleTextContent;
+
+            // Force UI to update its size
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubbleRectTransform);
+
+            // Play audio
+            audioSource.clip = narrationClip;
+            audioSource.Play();
+
+            // Wait for audio to finish
+            yield return new WaitForSeconds(narrationClip.length);
+
+            // Clear text and hide speech bubble
+            subtitleText.text = "";
+            speechBubble.SetActive(false);
+
+            narrationCoroutine = null; // Clear reference after it finishes
+
+        }
+    }
 }
+
 
 public class MonsterTracker : MonoBehaviour
 {

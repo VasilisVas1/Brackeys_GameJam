@@ -8,7 +8,7 @@ public class WandShooting : MonoBehaviour
     public float magicSpeed = 20f;      // Speed of the magic balls
     public AudioSource magicShoot;
 
-    private bool canShoot = false;      // Becomes true when the player picks up the wand
+    public bool canShoot = false;      // Becomes true when the player picks up the wand
 
     void Update()
     {

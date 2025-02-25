@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GuardianOfBeasts : MonoBehaviour
 {
@@ -27,6 +29,12 @@ public class GuardianOfBeasts : MonoBehaviour
     public GameObject leftEye,rightEye;
     public Material newMaterial; // Assign this in the Inspector
 
+    //test test test
+    public TMP_Text subtitleText;
+    public GameObject speechBubble; // Reference to the speech bubble UI
+    public RectTransform bubbleRectTransform; // The RectTransform of the speech bubble
+        public string subtitleTextContent;
+
 
 
     void Start()
@@ -53,6 +61,18 @@ void StartChallenge()
 
     challengeStarted = true;
     uiMessage.SetActive(false);
+
+//TEST TEST TEST
+            speechBubble.SetActive(true);
+            
+            // Set subtitle text
+            subtitleText.text = subtitleTextContent;
+
+            // Force UI to update its size
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubbleRectTransform);
+            //TEST TEST TEST
+
+
     challengeAudio.Play();
     StartCoroutine(BeastMovementRoutine());
 }
@@ -60,6 +80,8 @@ void StartChallenge()
     IEnumerator BeastMovementRoutine()
     {
         yield return new WaitForSeconds(challengeAudio.clip.length);
+        subtitleText.text = "";
+    speechBubble.SetActive(false);
         beast.SetActive(true);
 
         while (challengeStarted)
@@ -142,6 +164,16 @@ void StartChallenge()
     challengeCompleted = true; // Marks challenge as completed
     jumpAudio = null;
     successAudio.Play();
+
+
+    speechBubble.SetActive(true);
+            
+            // Set subtitle text
+            subtitleText.text = "The elusive spirit of the mushroom forest is now tamed. As your reward, I bestow upon you the Red Rock—use it to unlock the path ahead.";
+
+            // Force UI to update its size
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bubbleRectTransform);
+            //TEST TEST TEST
     StartCoroutine(GrantReward());
 }
 
@@ -149,6 +181,11 @@ void StartChallenge()
     {
         yield return new WaitForSeconds(successAudio.clip.length);
         rewardObject.SetActive(true);
+
+
+        subtitleText.text = "";
+        speechBubble.SetActive(false);
+
 
         //TEST TEST TEST TEST
         blueTrigger.SetActive(true);
