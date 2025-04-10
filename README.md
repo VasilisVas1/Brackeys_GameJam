@@ -34,7 +34,3 @@ Some players suggested **performance optimizations** for an even better experien
 ## Play the Game
 
 **[Play Fever Dream on itch.io](https://itch.io/jam/brackeys-13/rate/3347702)**  
-
-## License
-
-This project is licensed under the **MIT License**.
